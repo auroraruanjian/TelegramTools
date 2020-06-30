@@ -1,0 +1,82 @@
+{
+    "name": "amphp/http-client",
+    "homepage": "https://github.com/amphp/http-client",
+    "description": "Asynchronous concurrent HTTP/2 and HTTP/1.1 client built on the Amp concurrency framework",
+    "keywords": [
+        "http",
+        "rest",
+        "client",
+        "concurrent",
+        "async",
+        "non-blocking"
+    ],
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Daniel Lowrey",
+            "email": "rdlowrey@gmail.com"
+        },
+        {
+            "name": "Niklas Keller",
+            "email": "me@kelunik.com"
+        },
+        {
+            "name": "Aaron Piotrowski",
+            "email": "aaron@trowski.com"
+        }
+    ],
+    "require": {
+        "php": ">=7.2",
+        "amphp/amp": "^2.4",
+        "amphp/byte-stream": "^1.6",
+        "amphp/hpack": "^3",
+        "amphp/http": "^1.6",
+        "amphp/socket": "^1",
+        "amphp/sync": "^1.3",
+        "league/uri": "^6",
+        "psr/http-message": "^1"
+    },
+    "require-dev": {
+        "ext-json": "*",
+        "amphp/file": "^1 || ^0.3 || ^0.2",
+        "amphp/phpunit-util": "^1.1",
+        "amphp/php-cs-fixer-config": "dev-master",
+        "phpunit/phpunit": "^7 || ^8",
+        "amphp/http-server": "^2-rc4",
+        "kelunik/link-header-rfc5988": "^1.0",
+        "clue/socks-react": "^1.0",
+        "amphp/react-adapter": "^2.1"
+    },
+    "suggest": {
+        "ext-zlib": "Allows using compression for response bodies.",
+        "ext-json": "Required for logging HTTP archives",
+        "amphp/file": "Required for file request bodies and HTTP archive logging"
+    },
+    "autoload": {
+        "psr-4": {
+            "Amp\\Http\\Client\\": "src"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Amp\\Http\\Client\\": "test"
+        }
+    },
+    "conflict": {
+        "amphp/file": "<0.2 || >=2"
+    },
+    "scripts": {
+        "check": [
+            "@cs",
+            "@test"
+        ],
+        "cs": "PHP_CS_FIXER_IGNORE_ENV=1 php-cs-fixer fix -v --diff --dry-run",
+        "cs-fix": "PHP_CS_FIXER_IGNORE_ENV=1 php-cs-fixer fix -v --diff",
+        "test": "@php -dzend.assertions=1 -dassert.exception=1 ./vendor/bin/phpunit --coverage-text"
+    },
+    "extra": {
+        "branch-alias": {
+            "dev-master": "4.x-dev"
+        }
+    }
+}

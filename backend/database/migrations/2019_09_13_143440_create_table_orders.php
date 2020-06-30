@@ -16,7 +16,7 @@ class CreateTableOrders extends Migration
     {
         //
         Schema::create('orders', function (Blueprint $table) {
-            $table->bigIncrements('id')->comment('游戏帐变ID');
+            $table->increments('id')->comment('游戏帐变ID');
             $table->integer('from_user_id')->default(0)->comment('(发起人)用户 ID');
             $table->integer('to_user_id')->default(0)->comment('(关联人)用户 ID');
             $table->smallInteger('admin_user_id')->default(0)->comment('管理员 ID');

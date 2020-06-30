@@ -10,7 +10,10 @@ module.exports = {
                 target: 'http://frontend-api.laravel_admin.me',
                 ws: true,
                 changeOrigin: true,
-                pathRewrite: {'^/api' : ''}
+                pathRewrite: {
+                    '^/api' : '',
+                    '^/socket.io' : '/socket.io',
+                }
             },
         }
     },

@@ -9,10 +9,11 @@
     "license": "MIT",
     "require": {
         "php": "^7.2",
-        "apanly/browser-detector": "dev-master",
         "fideloper/proxy": "^4.0",
         "laravel/framework": "^6.0",
-        "laravel/tinker": "^1.0"
+        "laravel/tinker": "^1.0",
+        "league/uri": "^6",
+        "league/uri-parser": "^1.4"
     },
     "require-dev": {
         "facade/ignition": "^1.4",
@@ -34,14 +35,16 @@
     "autoload": {
         "psr-4": {
             "App\\": "app/",
-            "Common\\": "./../common/"
+            "Common\\": "./../common/",
+            "phpseclib\\": "./vendor/phpseclib/phpseclib/phpseclib/"
         },
         "classmap": [
             "database/seeds",
             "database/factories"
         ],
         "files" : [
-            "./../common/Helpers/function.php"
+            "./../common/Helpers/function.php",
+            "./../common/Helpers/madeline/madeline.php"
         ]
     },
     "autoload-dev": {
@@ -62,5 +65,11 @@
         "post-create-project-cmd": [
             "@php artisan key:generate --ansi"
         ]
+    },
+    "repositories": {
+        "packagist": {
+            "type": "composer",
+            "url": "https://mirrors.aliyun.com/composer/"
+        }
     }
 }

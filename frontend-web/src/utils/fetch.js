@@ -6,7 +6,7 @@ import store from '@/store'
 const fetch = axios.create({
     baseURL: (process.env.NODE_ENV === 'production')?process.env.VUE_APP_DOMAIN:'/api',// url = base url + request url
     // withCredentials: true, // send cookies when cross-domain requests
-    timeout: 5000 // request timeout
+    timeout: 50000 // request timeout
 })
 
 fetch.defaults.headers.common['X-Requested-With'] = 'XMLHttpRequest';

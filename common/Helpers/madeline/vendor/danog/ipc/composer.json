@@ -1,0 +1,61 @@
+{
+    "name": "danog/ipc",
+    "description": "IPC component for Amp.",
+    "keywords": [
+        "asynchronous",
+        "async",
+        "concurrent",
+        "multi-threading",
+        "multi-processing"
+    ],
+    "homepage": "https://github.com/danog/ipc",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Daniil Gentili",
+            "email": "daniil@daniil.it"
+        },
+        {
+            "name": "Aaron Piotrowski",
+            "email": "aaron@trowski.com"
+        },
+        {
+            "name": "Stephen Coakley",
+            "email": "me@stephencoakley.com"
+        }
+    ],
+    "require": {
+        "php": ">=7.1",
+        "amphp/byte-stream": "^1",
+        "amphp/parser": "^1"
+    },
+    "require-dev": {
+        "amphp/amp": "^2.4",
+        "amphp/parallel": "^1.3",
+        "phpunit/phpunit": "^7 | ^8 | ^9",
+        "amphp/phpunit-util": "^1.3",
+        "amphp/php-cs-fixer-config": "dev-master"
+    },
+    "autoload": {
+        "psr-4": {
+            "Amp\\Ipc\\": "lib"
+        },
+        "files": [
+            "lib/functions.php"
+        ]
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Amp\\Ipc\\Test\\": "test"
+        }
+    },
+    "scripts": {
+        "check": [
+            "@cs",
+            "@test"
+        ],
+        "cs": "php-cs-fixer fix -v --diff --dry-run",
+        "cs-fix": "php-cs-fixer fix -v --diff",
+        "test": "@php -dzend.assertions=1 -dassert.exception=1 ./vendor/bin/phpunit --coverage-text"
+    }
+}

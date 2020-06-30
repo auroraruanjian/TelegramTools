@@ -8,18 +8,57 @@ Vue.use(VueRouter)
 NProgress.inc(0.2)
 NProgress.configure({ easing: 'ease', speed: 500, showSpinner: false })
 
+import Layout from '../views-web/layout/layout.vue'
 import Index from '../views-web/index/Index.vue'
 
 const routes = [
     {
-        path: '/',
-        name: 'Index',
-        component: Index
-    },
-    {
         path: '/login',
         name: 'Login',
         component: () => import('../views-web/user/login.vue')
+    },
+    {
+        path: '/',
+        name: 'Index',
+        component: Index,
+    },
+    /*
+    {
+        path: '/user',
+        name: 'UserIndex',
+        component: Layout,
+        redirect: '/user/index',
+        children: [
+            {
+                path: 'index',
+                component: () => import('../views-web/user/index.vue'),
+            },
+        ]
+    },
+    */
+    {
+        path: '/telegram',
+        name: 'Telegram',
+        redirect: '/telegram/list',
+        component: Layout,
+        children: [
+            {
+                path: 'list',
+                component: () => import('../views-web/telegram/list.vue'),
+            },
+            {
+                path: 'manage/:id',
+                component: () => import('../views-web/telegram/manage.vue'),
+            },
+            {
+                path: 'task',
+                component: () => import('../views-web/telegram/task.vue'),
+            },
+            {
+                path: 'scan',
+                component: () => import('../views-web/telegram/scan.vue'),
+            }
+        ]
     },
 ]
 
@@ -33,7 +72,7 @@ router.beforeEach(async (to, from, next) =>  {
     if( tokenStore ){
         tokenStore = JSON.parse(tokenStore);
 
-        if (to.path === '/login') {
+        if (to.path === '/login' ) {
             next({path:'/'});
         }else{
             const is_login = store.getters.username && store.getters.username.length > 0

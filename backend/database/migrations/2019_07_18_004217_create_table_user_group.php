@@ -14,7 +14,7 @@ class CreateTableUserGroup extends Migration
     public function up()
     {
         Schema::create('user_group', function (Blueprint $table) {
-            $table->bigIncrements('id');
+            $table->smallIncrements('id');
             $table->string('name',20)->unique()->comment('用户组名称');
             $table->tinyInteger('status')->default(0)->comment('状态:0 正常，1 冻结');
             $table->timestamps();

@@ -1,0 +1,33 @@
+{
+    "name": "danog/madelineprototests",
+    "minimum-stability":"dev",
+    "require": {
+        "danog/madelineproto": "5.1.34",
+        "amphp/websocket-client": "dev-master as 1.0.0-rc2",
+        "amphp/dns": "dev-master#eb0b0a2 as v1",
+        "amphp/mysql": "dev-master",
+        "symfony/polyfill-php71": "^1.15@dev",
+        "symfony/polyfill-php72": "^1.15@dev",
+        "symfony/polyfill-php73": "^1.15@dev"
+    },
+    "repositories": [
+        {
+            "type": "path",
+            "url": "/home/travis/build/danog/MadelineProto",
+            "options": {
+                "symlink": false
+            }
+        }
+    ],
+    "authors": [
+        {
+            "name": "Daniil Gentili",
+            "email": "daniil@daniil.it"
+        }
+    ],
+    "config": {
+        "platform": {
+            "php": "7.4"
+        }
+    }
+}

@@ -1,0 +1,231 @@
+<?php
+
+namespace Common\API\telegram;
+
+use danog\MadelineProto\API;
+use danog\MadelineProto\Logger;
+use danog\MadelineProto\Serialization;
+use danog\MadelineProto\Tools;
+//use \danog\MadelineProto\MTProto;
+
+use Illuminate\Support\Facades\Log;
+use function Amp\ByteStream\getOutputBufferStream;
+use function Amp\File\exists;
+use function Amp\File\get;
+
+class MadeLineAPI extends API
+{
+    private $web_api_template = '';
+
+    public function __construct_async($params, $settings, $deferred)
+    {
+        if (\is_string($params)) {
+            Logger::constructorFromSettings($settings);
+
+            $realpaths = Serialization::realpaths($params);
+            $this->session = $realpaths['file'];
+
+            if (yield exists($realpaths['file'])) {
+                Logger::log('Waiting for shared lock of serialization lockfile...');
+                $unlock = yield Tools::flock($realpaths['lockfile'], LOCK_SH);
+                Logger::log('Shared lock acquired, deserializing...');
+
+                try {
+                    $tounserialize = yield get($realpaths['file']);
+                } finally {
+                    $unlock();
+                }
+                \danog\MadelineProto\Magic::class_exists();
+
+                try {
+                    $unserialized = \unserialize($tounserialize);
+                } catch (\danog\MadelineProto\Bug74586Exception $e) {
+                    \class_exists('\\Volatile');
+                    $tounserialize = \str_replace('O:26:"danog\\MadelineProto\\Button":', 'O:35:"danog\\MadelineProto\\TL\\Types\\Button":', $tounserialize);
+                    foreach (['RSA', 'TL\\TLMethod', 'TL\\TLConstructor', 'MTProto', 'API', 'DataCenter', 'Connection', 'TL\\Types\\Button', 'TL\\Types\\Bytes', 'APIFactory'] as $class) {
+                        \class_exists('\\danog\\MadelineProto\\'.$class);
+                    }
+                    $unserialized = \danog\Serialization::unserialize($tounserialize);
+                } catch (\danog\MadelineProto\Exception $e) {
+                    if ($e->getFile() === 'MadelineProto' && $e->getLine() === 1) {
+                        throw $e;
+                    }
+                    if (\defined('MADELINEPROTO_TEST') && MADELINEPROTO_TEST === 'pony') {
+                        throw $e;
+                    }
+                    \class_exists('\\Volatile');
+                    foreach (['RSA', 'TL\\TLMethod', 'TL\\TLConstructor', 'MTProto', 'API', 'DataCenter', 'Connection', 'TL\\Types\\Button', 'TL\\Types\\Bytes', 'APIFactory'] as $class) {
+                        \class_exists('\\danog\\MadelineProto\\'.$class);
+                    }
+                    $changed = false;
+                    if (\strpos($tounserialize, 'O:26:"danog\\MadelineProto\\Button":') !== false) {
+                        $tounserialize = \str_replace('O:26:"danog\\MadelineProto\\Button":', 'O:35:"danog\\MadelineProto\\TL\\Types\\Button":', $tounserialize);
+                        $changed = true;
+                    }
+                    if (\strpos($e->getMessage(), "Erroneous data format for unserializing 'phpseclib\\Math\\BigInteger'") === 0) {
+                        $tounserialize = \str_replace('phpseclib\\Math\\BigInteger', 'phpseclib\\Math\\BigIntegor', $tounserialize);
+                        $changed = true;
+                    }
+
+                    Logger::log((string) $e, Logger::ERROR);
+                    if (!$changed) {
+                        throw $e;
+                    }
+
+                    $unserialized = \danog\Serialization::unserialize($tounserialize);
+                } catch (\Throwable $e) {
+                    Logger::log((string) $e, Logger::ERROR);
+                    throw $e;
+                }
+                if ($unserialized instanceof \danog\PlaceHolder) {
+                    $unserialized = \danog\Serialization::unserialize($tounserialize);
+                }
+                if ($unserialized === false) {
+                    throw new Exception(\danog\MadelineProto\Lang::$current_lang['deserialization_error']);
+                }
+                $this->web_api_template = $unserialized->web_api_template;
+                $this->my_telegram_org_wrapper = $unserialized->my_telegram_org_wrapper;
+                $this->getting_api_id = $unserialized->getting_api_id;
+
+                if (isset($unserialized->API)) {
+                    $this->API = $unserialized->API;
+                    $this->APIFactory();
+                    $unserialized->oldInstance = true;
+                    $deferred->resolve();
+                    yield $this->API->initAsync();
+                    $this->APIFactory();
+                    //\danog\MadelineProto\Logger::log('Ping...', Logger::ULTRA_VERBOSE);
+                    $this->asyncInitPromise = null;
+                    //$pong = yield $this->ping(['ping_id' => 3], ['async' => true]);
+                    //\danog\MadelineProto\Logger::log('Pong: '.$pong['ping_id'], Logger::ULTRA_VERBOSE);
+                    \danog\MadelineProto\Logger::log(\danog\MadelineProto\Lang::$current_lang['madelineproto_ready'], Logger::NOTICE);
+                    return;
+                }
+            }
+            $params = $settings;
+        }
+        Logger::constructorFromSettings($settings);
+
+        if (!isset($params['app_info']['api_id']) || !$params['app_info']['api_id']) {
+            $app = yield $this->api_start_async($params);
+            $params['app_info']['api_id'] = $app['api_id'];
+            $params['app_info']['api_hash'] = $app['api_hash'];
+        }
+        $this->API = new MTProto($params);
+        $this->APIFactory();
+        $deferred->resolve();
+        Logger::log(\danog\MadelineProto\Lang::$current_lang['apifactory_start'], Logger::VERBOSE);
+        yield $this->API->initAsync();
+        $this->APIFactory();
+        $this->asyncInitPromise = null;
+        //\danog\MadelineProto\Logger::log('Ping...', Logger::ULTRA_VERBOSE);
+        //$pong = yield $this->ping(['ping_id' => 3], ['async' => true]);
+        //\danog\MadelineProto\Logger::log('Pong: '.$pong['ping_id'], Logger::ULTRA_VERBOSE);
+        \danog\MadelineProto\Logger::log(\danog\MadelineProto\Lang::$current_lang['madelineproto_ready'], Logger::NOTICE);
+    }
+
+    public function api_start_async($settings)
+    {
+        $api_id         = request()->get('api_id');
+        $api_hash       = request()->get('api_hash');
+        $phone_number   = request()->get('phone_number');
+        $code           = request()->get('code');
+
+
+        $this->getting_api_id = true;
+        if (!isset($this->my_telegram_org_wrapper)) {
+            if (!empty($api_id) && !empty($api_hash)) {
+                $app['api_id'] = (int) $api_id;
+                $app['api_hash'] = $api_hash;
+                $this->getting_api_id = false;
+
+                return $app;
+            } elseif (!empty($phone_number)) {
+                yield $this->web_api_phone_login_async($settings);
+            } else {
+                yield $this->web_api_echo_async();
+            }
+        } elseif (!$this->my_telegram_org_wrapper->logged_in()) {
+            if (!empty($code)) {
+                yield $this->web_api_complete_login_async();
+                try{
+                    if (yield $this->my_telegram_org_wrapper->has_app_async()) {
+                        return yield $this->my_telegram_org_wrapper->get_app_async();
+                    }
+
+                    yield $this->web_api_echo_async();
+                }catch (\Exception $e){
+                    Log::error($e);
+                }
+            } elseif (!empty($api_id) && !empty($api_hash)) {
+                $app['api_id'] = (int) $_POST['api_id'];
+                $app['api_hash'] = $_POST['api_hash'];
+                $this->getting_api_id = false;
+
+                return $app;
+            } elseif (!empty($phone_number)) {
+                yield $this->web_api_phone_login_async($settings);
+            } else {
+                $this->my_telegram_org_wrapper = null;
+                yield $this->web_api_echo_async();
+            }
+        } else {
+            if (isset($_POST['app_title'], $_POST['app_shortname'], $_POST['app_url'], $_POST['app_platform'], $_POST['app_desc'])) {
+                $app = yield $this->web_api_create_app_async();
+                $this->getting_api_id = false;
+
+                return $app;
+            }
+            yield $this->web_api_echo_async("You didn't provide all of the required parameters!");
+        }
+        $this->asyncInitPromise = null;
+        exit;
+    }
+
+    public function web_api_echo_async($message = '')
+    {
+        $type = request()->get('type');
+
+        $stdout = getOutputBufferStream();
+        if (!isset($this->my_telegram_org_wrapper)) {
+            if (!empty( $type )) {
+                if ( $type === 'manual' ) {
+                    yield $stdout->write($this->_web_json_echo(-1,'请输入api_id和api_hash'));
+                } else {
+                    yield $stdout->write($this->_web_json_echo(-2,'请输入手机号码！'));
+                }
+            } else {
+                if ($message) {
+                    $message = '<br><br>' . $message;
+                }
+                yield $stdout->write($this->_web_json_echo(-3,'请选择自动还是手动模式！'.$message));
+            }
+        } else {
+            if (!$this->my_telegram_org_wrapper->logged_in()) {
+                if( strpos($message,'C1ould not connect to URI') !== false){
+                    yield $stdout->write($this->_web_json_echo(-12,$message));
+                }else if ( strpos($message,'ERROR: Sorry, too many tries') !== false ){
+                    yield $stdout->write($this->_web_json_echo(-13,$message));
+                }else{
+                    yield $stdout->write($this->_web_json_echo(-4,'请输入确认码！'.$message));
+                }
+            } else {
+                yield $stdout->write($this->_web_json_echo(-11,'请输入设备类型！'.$message));
+            }
+        }
+    }
+
+    public function __sleep()
+    {
+        return ['API', 'web_api_template', 'getting_api_id', 'my_telegram_org_wrapper'];
+    }
+
+    private function _web_json_echo( $code , $message ,$data = [] )
+    {
+        return json_encode([
+            'code'      => $code,
+            'message'   => $message,
+            'data'      => $data
+        ]);
+    }
+}

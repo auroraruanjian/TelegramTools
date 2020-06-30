@@ -81,7 +81,7 @@
                         setlocalStorage('username',username);
                         setlocalStorage('remember_password',password);
 
-                        _this.$router.push({ path: '/' });
+                        _this.$router.push({ path: '/telegram/list' });
                     } else {
                         this.refreshCaptcha();
                         this.$alert(response.data.msg,'提示',{type:'error'});

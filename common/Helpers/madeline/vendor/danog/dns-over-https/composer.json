@@ -1,0 +1,79 @@
+{
+    "name": "danog/dns-over-https",
+    "homepage": "https://github.com/danog/dns-over-https",
+    "description": "Async DNS-over-HTTPS resolution for Amp.",
+    "keywords": [
+        "dns",
+        "doh",
+        "dns-over-https",
+        "https",
+        "resolve",
+        "client",
+        "async",
+        "amp",
+        "amphp"
+    ],
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Daniil Gentili",
+            "email": "daniil@daniil.it"
+        },
+        {
+            "name": "Chris Wright",
+            "email": "addr@daverandom.com"
+        },
+        {
+            "name": "Daniel Lowrey",
+            "email": "rdlowrey@php.net"
+        },
+        {
+            "name": "Bob Weinand",
+            "email": "bobwei9@hotmail.com"
+        },
+        {
+            "name": "Niklas Keller",
+            "email": "me@kelunik.com"
+        },
+        {
+            "name": "Aaron Piotrowski",
+            "email": "aaron@trowski.com"
+        }
+    ],
+    "require": {
+        "php": ">=7.0",
+        "amphp/cache": "^1",
+        "amphp/parser": "^1",
+        "danog/libdns-json": "^0.1",
+        "daverandom/libdns": "^2.0.1",
+        "amphp/amp": "^2",
+        "amphp/http-client": "^4",
+        "amphp/dns": "^1",
+        "ext-filter": "*",
+        "ext-json": "*"
+    },
+    "require-dev": {
+        "amphp/phpunit-util": "^1",
+        "phpunit/phpunit": "^6",
+        "amphp/php-cs-fixer-config": "dev-master"
+    },
+    "autoload": {
+        "psr-4": {
+            "Amp\\DoH\\": "lib"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Amp\\DoH\\Test\\": "test"
+        }
+    },
+    "scripts": {
+        "check": [
+            "@cs",
+            "@test"
+        ],
+        "cs": "PHP_CS_FIXER_IGNORE_ENV=1 php-cs-fixer fix -v --diff --dry-run",
+        "cs-fix": "PHP_CS_FIXER_IGNORE_ENV=1 php-cs-fixer fix -v --diff",
+        "test": "@php -dzend.assertions=1 -dassert.exception=1 ./vendor/bin/phpunit --coverage-text"
+    }
+}

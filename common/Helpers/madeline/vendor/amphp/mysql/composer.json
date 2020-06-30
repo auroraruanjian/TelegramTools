@@ -1,0 +1,53 @@
+{
+    "name": "amphp/mysql",
+    "description": "Asynchronous MySQL client for PHP based on Amp.",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Bob Weinand",
+            "email": "bobwei9@hotmail.com"
+        },
+        {
+            "name": "Aaron Piotrowski",
+            "email": "aaron@trowski.com"
+        }
+    ],
+    "require": {
+        "php": ">=7.1",
+        "amphp/amp": "^2",
+        "amphp/file": "^1 || ^0.3.5",
+        "amphp/socket": "^1",
+        "amphp/sql": "^1",
+        "amphp/sql-common": "^1"
+    },
+    "require-dev": {
+        "ext-openssl": "*",
+        "phpunit/phpunit": "^8 || ^7",
+        "amphp/phpunit-util": "^1.1.2",
+        "amphp/php-cs-fixer-config": "dev-master",
+        "phpbench/phpbench": "^0.13.0"
+    },
+    "autoload": {
+        "psr-4": {
+            "Amp\\Mysql\\": "src"
+        },
+        "files": [
+            "src/functions.php"
+        ]
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Amp\\Mysql\\Test\\": "test",
+            "Amp\\Mysql\\Bench\\": "benchmarks"
+        }
+    },
+    "scripts": {
+        "check": [
+            "@cs",
+            "@test"
+        ],
+        "cs": "php-cs-fixer fix -v --diff --dry-run",
+        "cs-fix": "php-cs-fixer fix -v --diff",
+        "test": "@php -dzend.assertions=1 -dassert.exception=1 ./vendor/bin/phpunit"
+    }
+}
